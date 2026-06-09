@@ -1,35 +1,34 @@
 #!/usr/bin/env python3
 class Plant:
-    def __init__(self, name: str, height: float, age_days: int):
-        self.name = name
-        self.height = height
-        self.age_days = age_days
-        self.growth = round(height / age_days, 1)
-    
+    def __init__(self, name: str, height: float, age: int):
+        self._name = name
+        self._height = float(height)
+        self._age = age
+        if age == 0:
+            self._growth = 0.0
+        else:
+            self._growth = round(self._height / self._age, 1)
 
-    def show(self) -> None:
-        save = self.name.capitalize()
-        print(f"{save}: {self.height}cm, {self.age_days} days old")
     def age(self) -> None:
-        self.age_days += 1
-    
+        self._age += 1
 
     def grow(self) -> None:
-        self.height = round(self.height + self.growth, 1)
+        self._height = round(self._height + round(self._growth, 1), 1)
+
+    def show(self) -> None:
+        print(f"{self._name}: {self._height}cm, {self._age} days old")
+
+    def get_growth(self) -> float:
+        return self._growth
 
 
-    def simulate(self) -> None:
-        before_height = self.height
-        print("=== Garden Plant Growth ===")
-        self.show()
-        for i in range(1, 8):
-            self.grow()
-            self.age()
-            print(f"=== Day {i} ===")
-            self.show()
-        print(f"Growth this week: {round(self.height - before_height, 1)}cm")
-    
-
-if name == "__main__":
-    rose = Plant("Rose", 25, 30)
-    rose.simulate()
+if __name__ == "__main__":
+    print("=== Garden Plant Growth ===")
+    plant = Plant("Sunflower", 25, 45)
+    plant.show()
+    for i in range(1, 8):
+        print(f"=== Day {i} ===")
+        plant.age()
+        plant.grow()
+        plant.show()
+    print(f"Growth this week: {7 * plant.get_growth()}cm")
