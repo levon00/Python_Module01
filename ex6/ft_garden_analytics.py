@@ -17,11 +17,13 @@ class Plant:
         self._internal = Plant.InternalSystem(self)
 
     @staticmethod
-    def is_older_than_year(days: int) -> None:
+    def is_older_than_year(days: int) -> bool:
         if days <= 365:
             print(f"Is {days} days more than a year? -> False")
+            return False
         else:
             print(f"Is {days} days more than a year? -> True")
+            return True
 
     @classmethod
     def anonymous(cls) -> "Plant":
@@ -42,9 +44,6 @@ class Plant:
 
         def add_show_calls(self) -> None:
             self._show_calls += 1
-
-        def add_produce_shade(self) -> None:
-            pass
 
         def display(self) -> None:
             print(f"[statistics for {self._plant._name}]")
@@ -83,8 +82,11 @@ class Plant:
 
     def show(self) -> None:
         self._internal.add_show_calls()
-        print(f"Plant created: {self._name}: {self._height}cm, \
+        print(f"{self._name}: {self._height}cm, \
 {self._age} days old")
+    
+    def display_statistics(self) -> None:
+        self._internal.display()
 
 
 class Flower(Plant):
@@ -97,11 +99,6 @@ class Flower(Plant):
     def bloom(self) -> None:
         self._blooming = True
         print(f"[asking the {self._name} to bloom]")
-
-    def grow_bloom(self) -> None:
-        self._blooming = True
-        self.grow(8)
-        print(f"[asking the {self._name} to grow and bloom]")
 
     def show(self) -> None:
         super().show()
@@ -123,7 +120,9 @@ class Seed(Flower):
         self._blooming = True
         self.age(days)
         self.grow(days)
+        self._seeds += 42
         print(f"[asking the {self._name} grow, age and bloom]")
+
 
     def show(self) -> None:
         super().show()
@@ -160,28 +159,8 @@ class Tree(Plant):
  {self._height}cm long and {self._trunk_diameter}cm in wide")
 
 
-class Vegetable(Plant):
-    def __init__(self, name: str, height: float = 0, age: int = 0,
-                 harvest_season: str = "Unknown", nutritional_value: int = 0):
-        super().__init__(name, height, age)
-        self._harvest_season = harvest_season
-        self._nutritional_value = nutritional_value
-
-    def show(self) -> None:
-        super().show()
-        print(f" Harvest Season: {self._harvest_season}\n\
- Nutritional Value: {self._nutritional_value}")
-
-    def grow_age(self, days: int) -> None:
-        print(f"[make {self._name} grow and age for {days} days]")
-        self.age(days)
-        self.grow(days)
-        self._nutritional_value += days
-
-
-def statistics(plant: Plant) -> None:
-    plant._internal.display()
-
+def statistics(plant: "Plant") -> None:
+    plant.display_statistics()
 
 if __name__ == "__main__":
     print("=== Garden statistics ===")
@@ -192,7 +171,8 @@ if __name__ == "__main__":
     rose = Flower("Rose", 15, 10, "Red")
     rose.show()
     statistics(rose)
-    rose.grow_bloom()
+    rose.grow(8)
+    rose.bloom()
     rose.show()
     statistics(rose)
     print("\n=== Tree")
