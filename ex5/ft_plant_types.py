@@ -33,16 +33,24 @@ class Plant:
             print(f"{self._name}: Error, age cannot be negative")
             print("Age update rejected")
         else:
-            print(f"Age updated: {self._age} days")
             self._age = age
+            print(f"Age updated: {self._age} days")
+        self._update_growth()
 
     def set_height(self, height: float) -> None:
         if height < 0:
             print(f"{self._name}: Error, height cannot be negative")
             print("Height update rejected")
         else:
-            print(f"Height updated: {self._height}cm")
             self._height = height
+            print(f"Height updated: {self._height}cm")
+        self._update_growth()
+
+    def _update_growth(self) -> None:
+        if self._age == 0:
+            self._growth = 0.0
+        else:
+            self._growth = round(self._height / self._age, 1)
 
     def show(self) -> None:
         print(f"Plant created: {self._name}: \
@@ -51,6 +59,9 @@ class Plant:
     def state(self) -> None:
         print(f"Current state: {self._name}: \
 {self._height}cm, {self._age} days old")
+
+    def asking(self, text: str) -> None:
+        print(f"[asking the {self._name} to {text}]")
 
 
 class Flower(Plant):
@@ -62,7 +73,6 @@ class Flower(Plant):
 
     def bloom(self) -> None:
         self._blooming = True
-        print(f"[asking the {self._name} to bloom]")
 
     def show(self) -> None:
         super().show()
@@ -84,7 +94,6 @@ class Tree(Plant):
         print(f" Trunk Diameter: {self._trunk_diameter}cm")
 
     def produce_shade(self) -> None:
-        print(f"[asking the {self._name} to produce shade]")
         print(
             f"Tree {self._name} now produces a shade of {self._height}cm "
             f"long and {self._trunk_diameter}cm in wide"
@@ -122,11 +131,13 @@ if __name__ == "__main__":
     print("=== Flower")
     flower = Flower("Rose", 15, 10, "red")
     flower.show()
+    flower.asking("bloom")
     flower.bloom()
     flower.show()
     print("\n=== Tree")
     tree = Tree("Oak", 200, 365, 5)
     tree.show()
+    tree.asking("produce shade")
     tree.produce_shade()
     print("\n=== Vegetable")
     vegetable = Vegetable("Tomato", 5.0, 10, "April", 0)

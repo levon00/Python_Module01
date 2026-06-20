@@ -1,5 +1,26 @@
 #!/usr/bin/env python3
 class Plant:
+    class InternalSystem:
+        def __init__(self, plant: "Plant"):
+            self._plant = plant
+            self._age_calls = 0
+            self._grow_calls = 0
+            self._show_calls = 0
+
+        def add_age_calls(self) -> None:
+            self._age_calls += 1
+
+        def add_grow_calls(self) -> None:
+            self._grow_calls += 1
+
+        def add_show_calls(self) -> None:
+            self._show_calls += 1
+
+        def display(self) -> None:
+            print(f"[statistics for {self._plant._name}]")
+            print(f"Stats: {self._grow_calls} grow, "
+                  f"{self._age_calls} age, {self._show_calls} show")
+
     def __init__(self, name: str, height: float = 0, age: int = 0) -> None:
         self._name = name
         if (height < 0):
@@ -29,27 +50,6 @@ class Plant:
     def anonymous(cls) -> "Plant":
         return cls("Unknown plant", 0.0, 0)
 
-    class InternalSystem:
-        def __init__(self, plant: "Plant"):
-            self._plant = plant
-            self._age_calls = 0
-            self._grow_calls = 0
-            self._show_calls = 0
-
-        def add_age_calls(self) -> None:
-            self._age_calls += 1
-
-        def add_grow_calls(self) -> None:
-            self._grow_calls += 1
-
-        def add_show_calls(self) -> None:
-            self._show_calls += 1
-
-        def display(self) -> None:
-            print(f"[statistics for {self._plant._name}]")
-            print(f"Stats: {self._grow_calls} grow, \
-{self._age_calls} age, {self._show_calls} show")
-
     def age(self, days: int = 1) -> None:
         self._internal.add_age_calls()
         self._age += days
@@ -69,24 +69,35 @@ class Plant:
             print(f"{self._name}: Error, age cannot be negative")
             print("Age update rejected")
         else:
-            print(f"Age updated: {self._age} days")
             self._age = age
+            print(f"Age updated: {self._age} days")
+        self._update_growth()
 
     def set_height(self, height: float) -> None:
         if height < 0:
             print(f"{self._name}: Error, height cannot be negative")
             print("Height update rejected")
         else:
-            print(f"Height updated: {self._height}cm")
             self._height = height
+            print(f"Height updated: {self._height}cm")
+        self._update_growth()
+
+    def _update_growth(self) -> None:
+        if self._age == 0:
+            self._growth = 0.0
+        else:
+            self._growth = round(self._height / self._age, 1)
 
     def show(self) -> None:
         self._internal.add_show_calls()
-        print(f"{self._name}: {self._height}cm, \
-{self._age} days old")
-    
+        print(f"{self._name}: {self._height}cm, "
+              f"{self._age} days old")
+
     def display_statistics(self) -> None:
         self._internal.display()
+
+    def asking(self, text: str) -> None:
+        print(f"[asking the {self._name} to {text}]")
 
 
 class Flower(Plant):
@@ -98,7 +109,6 @@ class Flower(Plant):
 
     def bloom(self) -> None:
         self._blooming = True
-        print(f"[asking the {self._name} to bloom]")
 
     def show(self) -> None:
         super().show()
@@ -116,13 +126,9 @@ class Seed(Flower):
         self._seeds = seeds
         self._blooming = False
 
-    def grow_age_bloom(self, days: int = 1) -> None:
-        self._blooming = True
-        self.age(days)
-        self.grow(days)
+    def bloom(self) -> None:
+        super().bloom()
         self._seeds += 42
-        print(f"[asking the {self._name} grow, age and bloom]")
-
 
     def show(self) -> None:
         super().show()
@@ -130,6 +136,9 @@ class Seed(Flower):
 
 
 class Tree(Plant):
+
+    _internal: 'Tree.TreeSystem'
+
     class TreeSystem(Plant.InternalSystem):
         def __init__(self, plant: "Plant"):
             super().__init__(plant)
@@ -143,7 +152,7 @@ class Tree(Plant):
             print(f" {self._produce_shade_calls} shade")
 
     def __init__(self, name: str, height: float = 0,
-                 age: int = 0, trunk_diameter: int = 0):
+                 age: int = 0, trunk_diameter: float = 0):
         super().__init__(name, height, age)
         self._trunk_diameter = trunk_diameter
         self._internal = Tree.TreeSystem(self)
@@ -154,13 +163,13 @@ class Tree(Plant):
 
     def produce_shade(self) -> None:
         self._internal.add_produce_shade()
-        print(f"[asking the {self._name} to produce shade]")
-        print(f"Tree {self._name} now produces a shade of\
- {self._height}cm long and {self._trunk_diameter}cm in wide")
+        print(f"Tree {self._name} now produces a shade of "
+              f"{self._height}cm long and {self._trunk_diameter}cm in wide")
 
 
 def statistics(plant: "Plant") -> None:
     plant.display_statistics()
+
 
 if __name__ == "__main__":
     print("=== Garden statistics ===")
@@ -171,6 +180,7 @@ if __name__ == "__main__":
     rose = Flower("Rose", 15, 10, "Red")
     rose.show()
     statistics(rose)
+    rose.asking("grow and bloom")
     rose.grow(8)
     rose.bloom()
     rose.show()
@@ -179,12 +189,16 @@ if __name__ == "__main__":
     oak = Tree("Oak", 200, 365, 5)
     oak.show()
     statistics(oak)
+    oak.asking("produce shade")
     oak.produce_shade()
     statistics(oak)
     print("\n=== Seed")
     sunflower = Seed("Sunflower", 80, 45, "yellow", 0)
     sunflower.show()
-    sunflower.grow_age_bloom()
+    sunflower.asking("grow, age and bloom")
+    sunflower.grow()
+    sunflower.age()
+    sunflower.bloom()
     sunflower.show()
     statistics(sunflower)
     print("\n=== Anonymous")
