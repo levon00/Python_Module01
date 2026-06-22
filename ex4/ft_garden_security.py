@@ -9,7 +9,7 @@ class Plant:
         if age < 0:
             print("Age cannot be negative. Setting age to 0.")
             age = 0
-        self._height = float(height)
+        self._height = height
         self._age = age
         if age == 0:
             self._growth = 0.0
